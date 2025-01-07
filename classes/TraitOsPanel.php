@@ -175,11 +175,11 @@ trait TraitOsPanel
     {
         $ret = false;
         if ($this->osPanelHas()) {
-            // Определим список работающих доменов
+            //== Определим список работающих доменов
+            //-- Алгоритм № 1
             if (is_null(self::$hostsRunning)) {
                 // Если изменений не было, то проверим наличие домена 
                 $all = file_get_contents($this->osPanelGetUrlApi('all'));
-                $all = false;
                 if ($all !== false) {
                     if ($all !== false) {
                         $pos = strpos($all, '───');
@@ -214,25 +214,28 @@ trait TraitOsPanel
                     ), function (string $line) {
                         return !empty($line);
                     }));
-                } else {
-                    // http: //ospanel/getprojects - получить текущие проекты
-                    // http: //ospanel/getmodules                
-                    // 
-                    $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
-                    $main = $program['main'] ?? [];
-                    $api_ip = $main['api_ip'] ?? null;
-                    if (!empty($api_ip)) {
-                        $api_port = $main['api_port'] ?? 80;
-                        $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
-                        $rc = file_get_contents($url);
-                        if ($rc !== false) {
-                            $rcJson = json_decode($rc, true);
-                            //var_export($rcJson);
-                            self::$hostsRunning = array_flip(array_keys($rcJson));
-                        }
+                }
+            }
+            //-- Алгоритм № 2
+            if (is_null(self::$hostsRunning)) {
+                // http: //ospanel/getprojects - получить текущие проекты
+                // http: //ospanel/getmodules                
+                // 
+                $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
+                $main = $program['main'] ?? [];
+                $api_ip = $main['api_ip'] ?? null;
+                if (!empty($api_ip)) {
+                    $api_port = $main['api_port'] ?? 80;
+                    $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
+                    $rc = file_get_contents($url);
+                    if ($rc !== false) {
+                        $rcJson = json_decode($rc, true);
+                        //var_export($rcJson);
+                        self::$hostsRunning = array_flip(array_keys($rcJson));
                     }
                 }
             }
+            //
             if (array_key_exists($host, self::$hostsRunning)) {
                 $osPanelLock = $this->osPanelPath('temp/OSPanel.lock');
                 $timeOfCreation = filemtime($osPanelLock);
