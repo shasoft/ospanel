@@ -1,7 +1,7 @@
 {
   "name": "shasoft/ospanel",
   "type": "library",
-  "description": "Working with ospanel.io",
+  "description": "Performing http requests in tests using ospanel.io",
   "keywords": [
     "wamp",
     "ospanel",

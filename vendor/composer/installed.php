@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'shasoft/ospanel',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'ec32f3f4d68fe4085e5f87662c32efb025b08a2d',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -387,9 +387,9 @@
             'dev_requirement' => true,
         ),
         'shasoft/ospanel' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'ec32f3f4d68fe4085e5f87662c32efb025b08a2d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
