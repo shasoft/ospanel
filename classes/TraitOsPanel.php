@@ -55,7 +55,7 @@ trait TraitOsPanel
         return true;
     }
 
-    protected function osPanelHostCreate(string $filepath): string
+    private function _getTemplateHost(): string
     {
         //
         $tmp = explode("\\", str_replace("::", "\\", $this->toString()));
@@ -69,10 +69,19 @@ trait TraitOsPanel
         }
         $prefix = hash('crc32', implode('\\', $tmp));
         //
-        $host = strtolower($prefix . '-' . $nameClass . '-' . $nameMethod . '.net');
+        return strtolower($prefix . '-' . $nameClass . '-' . $nameMethod . '{i}.net');
+    }
+
+
+    protected function osPanelHostCreate(string $filepath): string
+    {
+        // Получить шаблон имени домена
+        $templateHost = $this->_getTemplateHost();
+        // Сформировать имя хоста на основе шаблона
+        $host = str_replace('{i}', '', $templateHost);
         $index = 1;
         while (array_key_exists($host, $this->domains)) {
-            $host = str_replace('.', (++$index) . '.', $host);
+            $host = str_replace('{i}', ++$index, $templateHost);
         }
         $this->domains[$host] = $filepath;
         //

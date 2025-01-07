@@ -117,4 +117,15 @@ class MainTest extends TestCase
             self::assertEquals($a . $x . $b, $response->getBody()->getContents());
         });
     }
+
+    public function testMultiHost(): void
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $this->getUri('/get', function (string $uri) {
+                $response = $this->client->get($uri);
+                self::assertEquals(200, $response->getStatusCode());
+                self::assertEquals('GetOk', $response->getBody()->getContents());
+            });
+        }
+    }
 }
