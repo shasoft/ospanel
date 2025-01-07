@@ -1,4 +1,6 @@
-# Трейт для работы с WAMP OSPanel
+## Трейт для работы с WAMP OSPanel
+
+### Введение
 
 Пакет предназначен для выполнения тестов с http запросами на основе веб-сервера [ospanel.io](https://ospanel.io).
 Позволяет автоматизировать создание проектов в OSPanel. Трейт `Shasoft\OsPanel\TraitOsPanel` добавляет следующие методы:
@@ -15,20 +17,26 @@ trait TraitOsPanel
 }    
 ```
 
-Пример использования
+### Пример использования
+
 ```php
-public function testDoc(): void
+namespace Shasoft\OsPanel\Tests\Unit;
+
+class MainTest extends TestCase
 {
-    // Создадим домен и привяжем к нему директорию сайта
-    $host = $this->osPanelHostCreate(__DIR__ . '/../../test-site');
-    // Домен активен для выполнения запросов?
-    if ($this->osPanelHostHas($host)) {
-        // Сформируем URI для выполнения запроса
-        $uri = 'https://' . $host . '/get';
-        // Выполним запрос
-        $response = $this->client->get($uri);
-        // Обработаем результата запроса
-        self::assertEquals(200, $response->getStatusCode());
+    public function testDoc(): void
+    {
+        // Создадим домен и привяжем к нему директорию сайта
+        $host = $this->osPanelHostCreate(__DIR__ . '/../../test-site');
+        // Домен активен для выполнения запросов?
+        if ($this->osPanelHostHas($host)) {
+            // Сформируем URI для выполнения запроса
+            $uri = 'https://' . $host . '/get';
+            // Выполним запрос
+            $response = $this->client->get($uri);
+            // Обработаем результата запроса
+            self::assertEquals(200, $response->getStatusCode());
+        }
     }
 }
 ```
@@ -46,5 +54,10 @@ public function testDoc(): void
 После перезапуска при повторном запуске теста запросы будут выполнены и результат проверен на корректность
 ![](docs/example.png)
 
+### Как это работает
+
+При вызове метода `osPanelHostCreate(<директория сайта>)` если запуск происходит внутри консоли OSPanel, то копируется текущий профиль (определяется по переменной среды **OSP_ACTIVE_ENV**) и с его настройками создается новый проект с указанным доменом. Если при этом такой домен уже был, то проверяется - изменились ли настройки. Если изменились, то домен будет неактивен для запросов (функция `osPanelHostHas(<домен>)` будет возвращать false) до перезагрузки OSPanel. Если настройки не изменились, то домен будет сразу доступен для запросов.
+
+### Версии OSPanel
 Работа проверена на следующих версиях:
 * Open Server Panel v6.0.0 x64 05.05.2024 18:22:30
