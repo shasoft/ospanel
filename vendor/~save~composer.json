@@ -1,0 +1,32 @@
+{
+  "name": "shasoft/ospanel",
+  "type": "library",
+  "description": "Working with ospanel.io",
+  "keywords": [
+    "wamp",
+    "ospanel",
+    "web-server"
+  ],
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Shasoft\\OsPanel\\": "classes"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10",
+    "robiningelbrecht/phpunit-pretty-print": "^1.2",
+    "guzzlehttp/guzzle": "^7.8.1"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Shasoft\\OsPanel\\Tests\\": "tests/classes"
+    }
+  },
+  "authors": [
+    {
+      "name": "Shabanov Valera",
+      "email": "git-shasoft-ospanel@shasoft.com"
+    }
+  ]
+}

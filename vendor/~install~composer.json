@@ -1,0 +1,243 @@
+{
+  "name": "shasoft/ospanel",
+  "type": "library",
+  "description": "Working with ospanel.io",
+  "keywords": [
+    "wamp",
+    "ospanel",
+    "web-server"
+  ],
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Shasoft\\OsPanel\\": "classes"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10",
+    "robiningelbrecht/phpunit-pretty-print": "^1.2",
+    "guzzlehttp/guzzle": "^7.8.1"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Shasoft\\OsPanel\\Tests\\": "tests/classes"
+    }
+  },
+  "authors": [
+    {
+      "name": "Shabanov Valera",
+      "email": "git-shasoft-ospanel@shasoft.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\data"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\dump"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\opts"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\test"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\batch"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\cache"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\cdump"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-api"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-seo"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\ci-php"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-auth"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-demo"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-form"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-i18n"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-twig"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\console"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\db-tool"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\ospanel"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-axios"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-cache"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-store"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-token"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\samoyed"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\composer"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-cookie"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-crypto"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-mailer"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-quasar"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\test-sub"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\db-schema"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\http-mime"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\psr-cache"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-message"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\filesystem"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\reflection"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-database"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-todolist"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\test-gitea"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\environment"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\samoyed-cmg"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\web-browser"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\http-factory"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\http-request"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\db-schema-dev"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\http-response"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\array-readonly"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\test-gitea-main"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\sql-query-builder"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\terminal-exec-php"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\cache-invalidation"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\terminal-write-php"
+    },
+    {
+      "type": "path",
+      "url": "E:\\Development\\repositories\\composer\\shasoft\\s-cookie\\http-cookie"
+    }
+  ]
+}
