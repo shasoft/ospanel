@@ -76,9 +76,14 @@ trait TraitOsPanel
 
     private function _createLink(string $from, string $to): bool
     {
-        @rmdir($to);
-        $rc = symlink($from, $to);
-        return $rc;
+        $ret = false;
+        if (is_link($to)) {
+            @rmdir($to);
+        }
+        if (file_exists($from)) {
+            $ret = symlink($from, $to);
+        }
+        return $ret;
     }
 
     protected function osPanelHostCreate(string $filepath): string
