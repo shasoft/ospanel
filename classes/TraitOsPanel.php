@@ -284,15 +284,14 @@ trait TraitOsPanel
                         $ret = true;
                     }
                     //echo $osPanelLock . PHP_EOL . $timeOfCreation . PHP_EOL . $timeOfChange . PHP_EOL . var_export($ret, true);
-                } else {
-                    // Проверим что создана ссылка на папку
-                    $filepathHostPublicHtml = $this->osPanelPath('home/' . $host . '/' . self::$public_html);
-                    if (!file_exists($filepathHostPublicHtml)) {
-                        $this->_createLink(
-                            $hostOptions['filepath'],
-                            $filepathHostPublicHtml
-                        );
-                    }
+                }
+                // Проверим что создана ссылка на папку
+                $filepathHostPublicHtml = $this->osPanelPath('home/' . $host . '/' . self::$public_html);
+                if (!file_exists($filepathHostPublicHtml)) {
+                    $this->_createLink(
+                        $hostOptions['filepath'],
+                        $filepathHostPublicHtml
+                    );
                 }
             }
         }
