@@ -2,6 +2,8 @@
 
 namespace Shasoft\OsPanel;
 
+use Shasoft\Filesystem\Link;
+
 trait TraitOsPanel
 {
     static private ?int $version = null;
@@ -72,6 +74,12 @@ trait TraitOsPanel
         return strtolower($prefix . '-' . $nameClass . '-' . $nameMethod . '{i}.net');
     }
 
+    private function _createLink(string $from, string $to): bool
+    {
+        @rmdir($to);
+        $rc = symlink($from, $to);
+        return $rc;
+    }
 
     protected function osPanelHostCreate(string $filepath): string
     {
@@ -141,8 +149,7 @@ trait TraitOsPanel
                         // Создать директорию
                         $this->_mkdir($filepathHostPublicHtml);
                         // Создать ссылку
-                        @rmdir($filepathHostPublicHtml);
-                        $rc = symlink($hostOptionsNew['filepath'], $filepathHostPublicHtml);
+                        $this->_createLink($hostOptionsNew['filepath'], $filepathHostPublicHtml);
                         // Сформировать Ini файл
                         $contentIni = '';
                         foreach ($hostsOptions as $_host => $_options) {
@@ -187,6 +194,31 @@ trait TraitOsPanel
             //== Определим список работающих доменов
             //-- Алгоритм № 1
             if (is_null(self::$hostsRunning)) {
+                // http: //ospanel/getprojects - получить текущие проекты
+                // http: //ospanel/getmodules                
+                // 
+                $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
+                $main = $program['main'] ?? [];
+                $api_ip = $main['api_ip'] ?? null;
+                if (!empty($api_ip)) {
+                    $api_port = $main['api_port'] ?? 80;
+                    $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
+                    $rc = file_get_contents($url);
+                    if ($rc !== false) {
+                        $rcJson = json_decode($rc, true);
+                        $rcJson = array_filter($rcJson, function (array $options) {
+                            return
+                                strtolower($options['enabled']) == 'true'
+                                &&
+                                strtolower($options['defected']) == 'false';
+                        });
+                        //var_export($rcJson);
+                        self::$hostsRunning = array_flip(array_keys($rcJson));
+                    }
+                }
+            }
+            //-- Алгоритм № 2
+            if (is_null(self::$hostsRunning)) {
                 // Если изменений не было, то проверим наличие домена 
                 $all = file_get_contents($this->osPanelGetUrlApi('all'));
                 if ($all !== false) {
@@ -215,7 +247,17 @@ trait TraitOsPanel
                         function (string $line) {
                             $pos = strpos($line, ' ');
                             if ($pos !== false) {
-                                $line = substr($line, 0, $pos);
+                                $line = preg_replace("/ {2,}/", " ", $line);
+                                $line = preg_replace("/\\e\\[\d{1,}m/", "", $line);
+                                $line = str_replace("не задано", "НеЗадано", $line);
+                                $tmp = array_values(array_filter(explode(" ", $line), function (string $line) {
+                                    return !empty(trim($line));
+                                }));
+                                if (mb_strtolower($tmp[4]) == 'ошибка') {
+                                    $line = '';
+                                } else {
+                                    $line = $tmp[0];
+                                }
                             }
                             return trim($line);
                         },
@@ -225,39 +267,32 @@ trait TraitOsPanel
                     }));
                 }
             }
-            //-- Алгоритм № 2
-            if (is_null(self::$hostsRunning)) {
-                // http: //ospanel/getprojects - получить текущие проекты
-                // http: //ospanel/getmodules                
-                // 
-                $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
-                $main = $program['main'] ?? [];
-                $api_ip = $main['api_ip'] ?? null;
-                if (!empty($api_ip)) {
-                    $api_port = $main['api_port'] ?? 80;
-                    $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
-                    $rc = file_get_contents($url);
-                    if ($rc !== false) {
-                        $rcJson = json_decode($rc, true);
-                        //var_export($rcJson);
-                        self::$hostsRunning = array_flip(array_keys($rcJson));
-                    }
-                }
-            }
-            //
-            if (array_key_exists($host, self::$hostsRunning)) {
-                $osPanelLock = $this->osPanelPath('temp/OSPanel.lock');
-                $timeOfCreation = filemtime($osPanelLock);
+            // Файл Ini с параметрами домена
+            $filepathHostIni = $this->osPanelPath('home/' . $host . self::$projectIni);
+            //-- Определим текущие параметры
+            $hostsOptions = $this->_load_ini($filepathHostIni);
+            if (array_key_exists($host, $hostsOptions)) {
+                //
+                $hostOptions = $hostsOptions[$host];
+                //
+                if (array_key_exists($host, self::$hostsRunning)) {
+                    $osPanelLock = $this->osPanelPath('temp/OSPanel.lock');
+                    $timeOfCreation = filemtime($osPanelLock);
 
-                $filepathHostIni = $this->osPanelPath('home/' . $host . self::$projectIni);
-                //-- Определим текущие параметры
-                $hostsOptions = $this->_load_ini($filepathHostIni);
-                if (array_key_exists($host, $hostsOptions)) {
-                    $timeOfChange = $hostsOptions[$host][self::$timeOfChange] ?? 0;
+                    $timeOfChange = $hostOptions[self::$timeOfChange] ?? 0;
                     if ($timeOfChange < $timeOfCreation) {
                         $ret = true;
                     }
                     //echo $osPanelLock . PHP_EOL . $timeOfCreation . PHP_EOL . $timeOfChange . PHP_EOL . var_export($ret, true);
+                } else {
+                    // Проверим что создана ссылка на папку
+                    $filepathHostPublicHtml = $this->osPanelPath('home/' . $host . '/' . self::$public_html);
+                    if (!file_exists($filepathHostPublicHtml)) {
+                        $this->_createLink(
+                            $hostOptions['filepath'],
+                            $filepathHostPublicHtml
+                        );
+                    }
                 }
             }
         }
