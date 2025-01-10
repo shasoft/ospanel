@@ -89,7 +89,8 @@ trait TraitOsPanel
     protected function osPanelHostCreate(string $filepath): string
     {
         // Получить шаблон имени домена
-        $templateHost = $this->_getTemplateHost();
+        $tmp = explode("::", $this->toString());
+        $templateHost = OsPanelUtils::templateHost($tmp[0], $tmp[1]);
         // Сформировать имя хоста на основе шаблона
         $host = str_replace('{i}', '', $templateHost);
         $index = 1;
