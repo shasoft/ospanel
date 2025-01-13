@@ -2,8 +2,6 @@
 
 namespace Shasoft\OsPanel;
 
-use Shasoft\Filesystem\Link;
-
 trait TraitOsPanel
 {
     static private ?int $version = null;
