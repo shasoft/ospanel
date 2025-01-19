@@ -195,107 +195,110 @@ trait TraitOsPanel
     {
         $ret = false;
         if ($this->osPanelHas()) {
-            //== Определим список работающих доменов
-            //-- Алгоритм № 1
-            if (is_null(self::$hostsRunning)) {
-                // http: //ospanel/getprojects - получить текущие проекты
-                // http: //ospanel/getmodules                
-                // 
-                $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
-                $main = $program['main'] ?? [];
-                $api_ip = $main['api_ip'] ?? null;
-                if (!empty($api_ip)) {
-                    $api_port = $main['api_port'] ?? 80;
-                    $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
-                    $rc = file_get_contents($url);
-                    if ($rc !== false) {
-                        $rcJson = json_decode($rc, true);
-                        $rcJson = array_filter($rcJson, function (array $options) {
-                            return
-                                strtolower($options['enabled']) == 'true'
-                                &&
-                                strtolower($options['defected']) == 'false';
-                        });
-                        //var_export($rcJson);
-                        self::$hostsRunning = array_flip(array_keys($rcJson));
+            //-- Определим: OSPanel запущен?
+            $osPanelLock = $this->osPanelPath('temp/OSPanel.lock');
+            if (file_exists($osPanelLock)) {
+                //== Определим список работающих доменов
+                //-- Алгоритм № 1
+                if (is_null(self::$hostsRunning)) {
+                    // http: //ospanel/getprojects - получить текущие проекты
+                    // http: //ospanel/getmodules                
+                    // 
+                    $program = $this->_load_ini($this->osPanelPath('config/program.ini'));
+                    $main = $program['main'] ?? [];
+                    $api_ip = $main['api_ip'] ?? null;
+                    if (!empty($api_ip)) {
+                        $api_port = $main['api_port'] ?? 80;
+                        $url = 'http://' . $api_ip . ':' . $api_port . '/getprojects';
+                        $rc = file_get_contents($url);
+                        if ($rc !== false) {
+                            $rcJson = json_decode($rc, true);
+                            $rcJson = array_filter($rcJson, function (array $options) {
+                                return
+                                    strtolower($options['enabled']) == 'true'
+                                    &&
+                                    strtolower($options['defected']) == 'false';
+                            });
+                            //var_export($rcJson);
+                            self::$hostsRunning = array_flip(array_keys($rcJson));
+                        }
                     }
                 }
-            }
-            //-- Алгоритм № 2
-            if (is_null(self::$hostsRunning)) {
-                // Если изменений не было, то проверим наличие домена 
-                $all = file_get_contents($this->osPanelGetUrlApi('all'));
-                if ($all !== false) {
+                //-- Алгоритм № 2
+                if (is_null(self::$hostsRunning)) {
+                    // Если изменений не было, то проверим наличие домена 
+                    $all = file_get_contents($this->osPanelGetUrlApi('all'));
                     if ($all !== false) {
-                        $pos = strpos($all, '───');
-                        if ($pos !== false) {
-                            $pos = strpos($all, "\n", $pos);
-                            if ($pos !== false) {
-                                $all = substr($all, $pos);
-                            }
+                        if ($all !== false) {
                             $pos = strpos($all, '───');
                             if ($pos !== false) {
-                                $all = substr($all, 0, $pos);
-                                $pos = strrpos($all, "\n");
+                                $pos = strpos($all, "\n", $pos);
                                 if ($pos !== false) {
-                                    $all = substr($all, 0, $pos);
+                                    $all = substr($all, $pos);
                                 }
-                                $pos = strrpos($all, "\n");
+                                $pos = strpos($all, '───');
                                 if ($pos !== false) {
                                     $all = substr($all, 0, $pos);
+                                    $pos = strrpos($all, "\n");
+                                    if ($pos !== false) {
+                                        $all = substr($all, 0, $pos);
+                                    }
+                                    $pos = strrpos($all, "\n");
+                                    if ($pos !== false) {
+                                        $all = substr($all, 0, $pos);
+                                    }
                                 }
                             }
                         }
-                    }
-                    self::$hostsRunning = array_flip(array_filter(array_map(
-                        function (string $line) {
-                            $pos = strpos($line, ' ');
-                            if ($pos !== false) {
-                                $line = preg_replace("/ {2,}/", " ", $line);
-                                $line = preg_replace("/\\e\\[\d{1,}m/", "", $line);
-                                $line = str_replace("не задано", "НеЗадано", $line);
-                                $tmp = array_values(array_filter(explode(" ", $line), function (string $line) {
-                                    return !empty(trim($line));
-                                }));
-                                if (mb_strtolower($tmp[4]) == 'ошибка') {
-                                    $line = '';
-                                } else {
-                                    $line = $tmp[0];
+                        self::$hostsRunning = array_flip(array_filter(array_map(
+                            function (string $line) {
+                                $pos = strpos($line, ' ');
+                                if ($pos !== false) {
+                                    $line = preg_replace("/ {2,}/", " ", $line);
+                                    $line = preg_replace("/\\e\\[\d{1,}m/", "", $line);
+                                    $line = str_replace("не задано", "НеЗадано", $line);
+                                    $tmp = array_values(array_filter(explode(" ", $line), function (string $line) {
+                                        return !empty(trim($line));
+                                    }));
+                                    if (mb_strtolower($tmp[4]) == 'ошибка') {
+                                        $line = '';
+                                    } else {
+                                        $line = $tmp[0];
+                                    }
                                 }
-                            }
-                            return trim($line);
-                        },
-                        explode("\n", $all)
-                    ), function (string $line) {
-                        return !empty($line);
-                    }));
-                }
-            }
-            // Файл Ini с параметрами домена
-            $filepathHostIni = $this->osPanelPath('home/' . $host . self::$projectIni);
-            //-- Определим текущие параметры
-            $hostsOptions = $this->_load_ini($filepathHostIni);
-            if (array_key_exists($host, $hostsOptions)) {
-                //
-                $hostOptions = $hostsOptions[$host];
-                //
-                if (array_key_exists($host, self::$hostsRunning)) {
-                    $osPanelLock = $this->osPanelPath('temp/OSPanel.lock');
-                    $timeOfCreation = filemtime($osPanelLock);
-
-                    $timeOfChange = $hostOptions[self::$timeOfChange] ?? 0;
-                    if ($timeOfChange < $timeOfCreation) {
-                        $ret = true;
+                                return trim($line);
+                            },
+                            explode("\n", $all)
+                        ), function (string $line) {
+                            return !empty($line);
+                        }));
                     }
-                    //echo $osPanelLock . PHP_EOL . $timeOfCreation . PHP_EOL . $timeOfChange . PHP_EOL . var_export($ret, true);
                 }
-                // Проверим что создана ссылка на папку
-                $filepathHostPublicHtml = $this->osPanelPath('home/' . $host . '/' . self::$public_html);
-                if (!file_exists($filepathHostPublicHtml)) {
-                    $this->_createLink(
-                        $hostOptions['filepath'],
-                        $filepathHostPublicHtml
-                    );
+                // Файл Ini с параметрами домена
+                $filepathHostIni = $this->osPanelPath('home/' . $host . self::$projectIni);
+                //-- Определим текущие параметры
+                $hostsOptions = $this->_load_ini($filepathHostIni);
+                if (array_key_exists($host, $hostsOptions)) {
+                    //
+                    $hostOptions = $hostsOptions[$host];
+                    //
+                    if (array_key_exists($host, self::$hostsRunning)) {
+                        $timeOfCreation = filemtime($osPanelLock);
+
+                        $timeOfChange = $hostOptions[self::$timeOfChange] ?? 0;
+                        if ($timeOfChange < $timeOfCreation) {
+                            $ret = true;
+                        }
+                        //echo $osPanelLock . PHP_EOL . $timeOfCreation . PHP_EOL . $timeOfChange . PHP_EOL . var_export($ret, true);
+                    }
+                    // Проверим что создана ссылка на папку
+                    $filepathHostPublicHtml = $this->osPanelPath('home/' . $host . '/' . self::$public_html);
+                    if (!file_exists($filepathHostPublicHtml)) {
+                        $this->_createLink(
+                            $hostOptions['filepath'],
+                            $filepathHostPublicHtml
+                        );
+                    }
                 }
             }
         }
